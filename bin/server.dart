@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_server_groups/databases/database.dart';
+import 'package:dart_server_groups/repos/group_repo.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -11,12 +14,12 @@ final _router = Router()
   ..get('/echo/<message>', _echoHandler);
 
 Future<Response> _rootHandler(Request req) async {
-  final db = await Database().conn;
-  final result = await db.execute(
-    'SELECT id, "name", start_year, create_at FROM public."group";',
+  final repo = GetIt.I<GroupRepo>();
+  final res = await repo.getAll();
+  return Response.ok(
+    json.encode(res.map((e) => e.toJson()).toList()),
+    headers: {"Content-Type": "application/json"},
   );
-  print(result);
-  return Response.ok('Hello, World!\n');
 }
 
 Response _echoHandler(Request request) {
@@ -24,8 +27,20 @@ Response _echoHandler(Request request) {
   return Response.ok('$message\n');
 }
 
+Future<void> setup() async {
+  final Database db = Database();
+
+  final groupRepo = GroupRepo(db: db);
+  await groupRepo.init();
+
+  GetIt.I.registerSingleton(groupRepo);
+}
+
 void main(List<String> args) async {
   // Use any available host or container IP (usually `0.0.0.0`).
+
+  await setup();
+
   final ip = InternetAddress.anyIPv4;
 
   // Configure a pipeline that logs requests.
