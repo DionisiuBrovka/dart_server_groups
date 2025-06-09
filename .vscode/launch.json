@@ -7,7 +7,8 @@
         {
             "name": "dart_server_groups",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "bin/server.dart"
         }
     ]
 }

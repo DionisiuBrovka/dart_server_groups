@@ -34,3 +34,10 @@ class GroupModel {
     );
   }
 }
+
+class GroupModelToDB {
+  String name;
+  int startYear;
+
+  GroupModelToDB({required this.name, required this.startYear});
+}

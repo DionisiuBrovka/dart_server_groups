@@ -1,31 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_server_groups/controllers/group_controller.dart';
 import 'package:dart_server_groups/databases/database.dart';
+import 'package:dart_server_groups/middlewares/json_content_type_middleware.dart';
 import 'package:dart_server_groups/repos/group_repo.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
-
-// Configure routes.
-final _router = Router()
-  ..get('/', _rootHandler)
-  ..get('/echo/<message>', _echoHandler);
-
-Future<Response> _rootHandler(Request req) async {
-  final repo = GetIt.I<GroupRepo>();
-  final res = await repo.getAll();
-  return Response.ok(
-    json.encode(res.map((e) => e.toJson()).toList()),
-    headers: {"Content-Type": "application/json"},
-  );
-}
-
-Response _echoHandler(Request request) {
-  final message = request.params['message'];
-  return Response.ok('$message\n');
-}
 
 Future<void> setup() async {
   final Database db = Database();
@@ -37,19 +19,20 @@ Future<void> setup() async {
 }
 
 void main(List<String> args) async {
-  // Use any available host or container IP (usually `0.0.0.0`).
+  final ip = InternetAddress.anyIPv4;
 
   await setup();
 
-  final ip = InternetAddress.anyIPv4;
+  final Router router = Router();
 
-  // Configure a pipeline that logs requests.
+  router.mount("/group/", GroupController().router.call);
+
   final handler = Pipeline()
       .addMiddleware(logRequests())
-      .addHandler(_router.call);
+      .addMiddleware(jsonContentTypeMiddleware())
+      .addHandler(router.call);
 
-  // For running in containers, we respect the PORT environment variable.
   final port = int.parse(Platform.environment['PORT'] ?? '8889');
   final server = await serve(handler, ip, port);
-  print('Server listening on port ${server.port}');
+  print('Server listening on  http://localhost:${server.port}/');
 }
