@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/group_repo.dart';
+import 'package:excel/excel.dart';
 
 import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:shelf_multipart/shelf_multipart.dart';
 
 class GroupController {
   final Router _router = Router();
@@ -69,6 +73,20 @@ class GroupController {
         return Response.ok("{}");
       } catch (e) {
         return Response.internalServerError(body: "{'error':$e}");
+      }
+    });
+
+    _router.post("/import/", (Request request) async {
+      final contentType = request.headers['content-type'];
+      if (contentType == null || !contentType.contains('multipart/form-data')) {
+        return Response.badRequest(body: 'Ожидается multipart/form-data');
+      }
+
+      if (request.formData() case var form?) {
+        await for (final formData in form.formData) {
+          var excel = Excel.decodeBytes(await formData.part.readBytes());
+          print(excel.sheets);
+        }
       }
     });
 
