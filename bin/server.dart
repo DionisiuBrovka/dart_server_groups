@@ -32,7 +32,7 @@ void main(List<String> args) async {
       .addMiddleware(jsonContentTypeMiddleware())
       .addHandler(router.call);
 
-  final port = int.parse(Platform.environment['PORT'] ?? '8889');
+  final port = int.parse(Platform.environment['PORT'] ?? '8989');
   final server = await serve(handler, ip, port);
   print('Server listening on  http://localhost:${server.port}/');
 }
