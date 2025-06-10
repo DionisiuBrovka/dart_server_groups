@@ -1,14 +1,15 @@
 import 'package:dart_server_groups/databases/database.dart';
 import 'package:dart_server_groups/databases/querys.dart';
 import 'package:dart_server_groups/models/group_model.dart';
+import 'package:dart_server_groups/repos/group_repo/group_repo.dart';
 import 'package:dart_server_groups/repos/repo_errors.dart';
 import 'package:postgres/postgres.dart';
 
-class GroupRepo {
+class PostgresGroupRepo extends GroupRepo {
   final Database db;
   late final Connection _conn;
 
-  GroupRepo({required this.db});
+  PostgresGroupRepo({required this.db});
 
   Future<void> init() async {
     _conn = await db.conn;
@@ -17,6 +18,7 @@ class GroupRepo {
   Future<void> dispose() async {}
 
   //===========================================
+  @override
   Future<List<GroupModel>> getAll() async {
     final result = await _conn.execute(getAllGroupsQuery());
 
@@ -24,6 +26,7 @@ class GroupRepo {
   }
 
   //===========================================
+  @override
   Future<GroupModel?> getById(int id) async {
     final result = await _conn.execute(getGroupByIdQuery(id));
 
@@ -35,7 +38,8 @@ class GroupRepo {
   }
 
   //===========================================
-  Future<GroupModel?> create(GroupModelToDB model) async {
+  @override
+  Future<GroupModel?> create(GroupModel model) async {
     final result = await _conn.execute(
       createGroupQuery(model.name, model.startYear),
     );
@@ -48,7 +52,8 @@ class GroupRepo {
   }
 
   //===========================================
-  Future<GroupModel?> update(int id, GroupModelToDB model) async {
+  @override
+  Future<GroupModel?> update(int id, GroupModel model) async {
     final result = await _conn.execute(
       updateGroupQuery(id, model.name, model.startYear),
     );
@@ -60,6 +65,7 @@ class GroupRepo {
   }
 
   //===========================================
+  @override
   Future<void> delete(int id) async {
     try {
       await _conn.execute(deleteGroupQuery(id));

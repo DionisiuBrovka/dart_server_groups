@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:dart_server_groups/middlewares/error_handler_middleware.dart';
 import 'package:dart_server_groups/models/group_model.dart';
-import 'package:dart_server_groups/repos/group_repo.dart';
+import 'package:dart_server_groups/repos/group_repo/group_repo.dart';
+import 'package:dart_server_groups/repos/group_repo/postgres_group_repo.dart';
 import 'package:excel/excel.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
@@ -11,7 +12,7 @@ import 'package:shelf_router/shelf_router.dart';
 
 class GroupController {
   final Router _router = Router();
-  final GroupRepo _groupRepo = GetIt.I<GroupRepo>();
+  final GroupRepo _groupRepo = GetIt.I<PostgresGroupRepo>();
 
   Router get router {
     //---------------------------------------------
@@ -47,7 +48,7 @@ class GroupController {
       final int startYear = requestData["startYear"];
 
       final result = await _groupRepo.create(
-        GroupModelToDB(name: name, startYear: startYear),
+        GroupModel(name: name, startYear: startYear),
       );
 
       return Response.ok(json.encode(result));
@@ -68,7 +69,7 @@ class GroupController {
 
       final result = await _groupRepo.update(
         int.parse(arg1),
-        GroupModelToDB(name: name, startYear: startYear),
+        GroupModel(name: name, startYear: startYear),
       );
 
       if (result == null) {

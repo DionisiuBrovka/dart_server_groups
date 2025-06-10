@@ -1,14 +1,14 @@
 class GroupModel {
-  int id;
+  int? id;
   String name;
   int startYear;
-  DateTime createAt;
+  DateTime? createAt;
 
   GroupModel({
-    required this.id,
+    this.id,
     required this.name,
     required this.startYear,
-    required this.createAt,
+    this.createAt,
   });
 
   factory GroupModel.fromJson(Map<String, dynamic> json) => GroupModel(
@@ -33,11 +33,4 @@ class GroupModel {
       createAt: data[3],
     );
   }
-}
-
-class GroupModelToDB {
-  String name;
-  int startYear;
-
-  GroupModelToDB({required this.name, required this.startYear});
 }
