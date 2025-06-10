@@ -5,8 +5,8 @@ class Database {
     Endpoint(
       host: 'localhost',
       database: 'server_group',
-      username: 'group_db_admin',
-      password: 'mgkct',
+      username: 'server_group_admin',
+      password: 'mata2042',
     ),
     settings: ConnectionSettings(sslMode: SslMode.disable),
   );

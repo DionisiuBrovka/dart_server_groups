@@ -1,4 +1,5 @@
 import 'package:dart_server_groups/databases/database.dart';
+import 'package:dart_server_groups/databases/querys.dart';
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/repo_errors.dart';
 import 'package:postgres/postgres.dart';
@@ -17,16 +18,14 @@ class GroupRepo {
 
   //===========================================
   Future<List<GroupModel>> getAll() async {
-    final result = await _conn.execute('SELECT * FROM public."group";');
+    final result = await _conn.execute(getAllGroupsQuery());
 
     return result.map((element) => GroupModel.fromDataRaw(element)).toList();
   }
 
   //===========================================
   Future<GroupModel?> getById(int id) async {
-    final result = await _conn.execute(
-      'SELECT * FROM public."group" where id = $id;',
-    );
+    final result = await _conn.execute(getGroupByIdQuery(id));
 
     if (result.length == 1) {
       return GroupModel.fromDataRaw(result[0]);
@@ -38,7 +37,7 @@ class GroupRepo {
   //===========================================
   Future<GroupModel?> create(GroupModelToDB model) async {
     final result = await _conn.execute(
-      "INSERT INTO public.group (name, start_year) VALUES('${model.name}', ${model.startYear}) RETURNING *;",
+      createGroupQuery(model.name, model.startYear),
     );
 
     if (result.length == 1) {
@@ -51,7 +50,7 @@ class GroupRepo {
   //===========================================
   Future<GroupModel?> update(int id, GroupModelToDB model) async {
     final result = await _conn.execute(
-      "UPDATE public.group SET name='${model.name}', start_year=${model.startYear}, create_at=CURRENT_TIMESTAMP WHERE id=$id RETURNING *;",
+      updateGroupQuery(id, model.name, model.startYear),
     );
 
     if (result.length == 1) {
@@ -63,7 +62,7 @@ class GroupRepo {
   //===========================================
   Future<void> delete(int id) async {
     try {
-      await _conn.execute("DELETE FROM public.group WHERE id=$id;");
+      await _conn.execute(deleteGroupQuery(id));
     } catch (e) {
       throw RepoErrors();
     }
