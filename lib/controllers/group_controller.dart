@@ -1,15 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/group_repo.dart';
 import 'package:excel/excel.dart';
-
 import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
-import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_multipart/shelf_multipart.dart';
+import 'package:shelf_router/shelf_router.dart';
 
 class GroupController {
   final Router _router = Router();
@@ -84,10 +81,22 @@ class GroupController {
 
       if (request.formData() case var form?) {
         await for (final formData in form.formData) {
-          var excel = Excel.decodeBytes(await formData.part.readBytes());
-          print(excel.sheets);
+          final filename = formData.filename
+              ?.split('filename="')
+              .last
+              .replaceAll('"', '');
+
+          if (filename == null || !filename.endsWith('.xlsx')) {
+            return Response.badRequest(body: 'Ожидается файл .xlsx');
+          } else {
+            var excel = Excel.decodeBytes(await formData.part.readBytes());
+            print(excel.sheets);
+            return Response.ok(excel.sheets.toString());
+          }
         }
       }
+
+      return Response.badRequest(body: 'Ошибка чтения файла');
     });
 
     return _router;
