@@ -1,1 +1,0 @@
-class RepoErrors extends Error {}

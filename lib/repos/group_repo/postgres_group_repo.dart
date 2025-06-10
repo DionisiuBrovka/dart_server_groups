@@ -2,7 +2,6 @@ import 'package:dart_server_groups/databases/database.dart';
 import 'package:dart_server_groups/databases/querys.dart';
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/group_repo/group_repo.dart';
-import 'package:dart_server_groups/repos/repo_errors.dart';
 import 'package:postgres/postgres.dart';
 
 class PostgresGroupRepo extends GroupRepo {
@@ -67,10 +66,6 @@ class PostgresGroupRepo extends GroupRepo {
   //===========================================
   @override
   Future<void> delete(int id) async {
-    try {
-      await _conn.execute(deleteGroupQuery(id));
-    } catch (e) {
-      throw RepoErrors();
-    }
+    await _conn.execute(deleteGroupQuery(id));
   }
 }
