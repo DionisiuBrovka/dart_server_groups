@@ -35,7 +35,13 @@ class GroupController {
 
     //---------------------------------------------
     _router.post("/", (Request request) async {
-      final requestData = json.decode(await request.readAsString());
+      late final Map<String, dynamic> requestData;
+
+      try {
+        requestData = json.decode(await request.readAsString());
+      } catch (e) {
+        throw BadRequestException({"error": "Данные запроса не валидны"});
+      }
 
       final String name = requestData["name"];
       final int startYear = requestData["startYear"];
@@ -49,7 +55,13 @@ class GroupController {
 
     //---------------------------------------------
     _router.put("/<pk|[0-9]+>/", (Request request, String arg1) async {
-      final requestData = json.decode(await request.readAsString());
+      late final Map<String, dynamic> requestData;
+
+      try {
+        requestData = json.decode(await request.readAsString());
+      } catch (e) {
+        throw BadRequestException({"error": "Данные запроса не валидны"});
+      }
 
       final String name = requestData["name"];
       final int startYear = requestData["startYear"];
