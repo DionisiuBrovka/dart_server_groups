@@ -4,15 +4,14 @@ import 'package:dart_server_groups/middlewares/error_handler_middleware.dart';
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/group_repo/group_repo.dart';
 import 'package:excel/excel.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_multipart/shelf_multipart.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 class GroupController {
   final Router _router = Router();
-  final GroupRepo groupRepo;
-
-  GroupController({required this.groupRepo});
+  final GroupRepo groupRepo = GetIt.I();
 
   Router get router {
     //---------------------------------------------

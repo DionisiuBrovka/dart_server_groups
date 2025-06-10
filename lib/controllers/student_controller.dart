@@ -3,14 +3,13 @@ import 'dart:convert';
 import 'package:dart_server_groups/middlewares/error_handler_middleware.dart';
 import 'package:dart_server_groups/models/student_model.dart';
 import 'package:dart_server_groups/repos/student_repo/student_repo.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 class StudentController {
   final Router _router = Router();
-  final StudentRepo studentRepo;
-
-  StudentController({required this.studentRepo});
+  final StudentRepo studentRepo = GetIt.I();
 
   Router get router {
     //---------------------------------------------
