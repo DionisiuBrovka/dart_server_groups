@@ -28,7 +28,7 @@ createStudentQuery(
   int? groupId,
   String birthday,
 ) =>
-    "INSERT INTO students_table (first_name, second_name, third_name, student_group, birthday) VALUES('$firstName', '$secondName', '$thirdName', $groupId, '$birthday');";
+    "INSERT INTO students_table (first_name, second_name, third_name, student_group, birthday) VALUES('$firstName', '$secondName', '$thirdName', $groupId, '$birthday') RETURNING * ;";
 
 updateStudentQuery(
   int id,
@@ -38,6 +38,6 @@ updateStudentQuery(
   int? groupId,
   String birthday,
 ) =>
-    "UPDATE students_table SET first_name='$firstName', second_name='$secondName', third_name='$thirdName', student_group=$groupId, birthday='$birthday' WHERE id=$id;";
+    "UPDATE students_table SET first_name='$firstName', second_name='$secondName', third_name='$thirdName', student_group=$groupId, birthday='$birthday' WHERE id=$id RETURNING * ;";
 
 deleteStudentQuery(int id) => "DELETE FROM groups_table WHERE id=$id";

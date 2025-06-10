@@ -7,11 +7,11 @@ class StudentModel {
   DateTime birthday;
 
   StudentModel({
-    required this.id,
+    this.id,
     required this.firstName,
     required this.secondName,
     required this.thirdName,
-    required this.group,
+    this.group,
     required this.birthday,
   });
 
@@ -40,7 +40,7 @@ class StudentModel {
       secondName: data[2],
       thirdName: data[3],
       group: data[4],
-      birthday: data[5],
+      birthday: data[6],
     );
   }
 }

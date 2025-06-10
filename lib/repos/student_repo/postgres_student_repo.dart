@@ -8,6 +8,7 @@ class PostgresStudentRepo extends StudentRepo {
 
   PostgresStudentRepo({required this.conn});
 
+  //===========================================
   @override
   Future<List<StudentModel>> getAll() async {
     final result = await conn.execute(getAllStudentsQuery());
@@ -15,17 +16,17 @@ class PostgresStudentRepo extends StudentRepo {
     return result.map((element) => StudentModel.fromDataRaw(element)).toList();
   }
 
+  //===========================================
   @override
-  Future<StudentModel?> getByGroupId(int groupId) async {
+  Future<List<StudentModel>> getByGroupId(int groupId) async {
     final result = await conn.execute(getStudentByGroupIdQuery(groupId));
 
-    if (result.length == 1) {
-      return StudentModel.fromDataRaw(result[0]);
-    }
+    print(result);
 
-    return null;
+    return result.map((element) => StudentModel.fromDataRaw(element)).toList();
   }
 
+  //===========================================
   @override
   Future<StudentModel?> getById(int id) async {
     final result = await conn.execute(getStudentByIdQuery(id));
