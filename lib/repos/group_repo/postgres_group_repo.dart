@@ -1,25 +1,17 @@
-import 'package:dart_server_groups/databases/database.dart';
 import 'package:dart_server_groups/databases/querys.dart';
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/group_repo/group_repo.dart';
 import 'package:postgres/postgres.dart';
 
 class PostgresGroupRepo extends GroupRepo {
-  final Database db;
-  late final Connection _conn;
+  final Connection conn;
 
-  PostgresGroupRepo({required this.db});
-
-  Future<void> init() async {
-    _conn = await db.conn;
-  }
-
-  Future<void> dispose() async {}
+  PostgresGroupRepo({required this.conn});
 
   //===========================================
   @override
   Future<List<GroupModel>> getAll() async {
-    final result = await _conn.execute(getAllGroupsQuery());
+    final result = await conn.execute(getAllGroupsQuery());
 
     return result.map((element) => GroupModel.fromDataRaw(element)).toList();
   }
@@ -27,7 +19,7 @@ class PostgresGroupRepo extends GroupRepo {
   //===========================================
   @override
   Future<GroupModel?> getById(int id) async {
-    final result = await _conn.execute(getGroupByIdQuery(id));
+    final result = await conn.execute(getGroupByIdQuery(id));
 
     if (result.length == 1) {
       return GroupModel.fromDataRaw(result[0]);
@@ -39,7 +31,7 @@ class PostgresGroupRepo extends GroupRepo {
   //===========================================
   @override
   Future<GroupModel?> create(GroupModel model) async {
-    final result = await _conn.execute(
+    final result = await conn.execute(
       createGroupQuery(model.name, model.startYear),
     );
 
@@ -53,7 +45,7 @@ class PostgresGroupRepo extends GroupRepo {
   //===========================================
   @override
   Future<GroupModel?> update(int id, GroupModel model) async {
-    final result = await _conn.execute(
+    final result = await conn.execute(
       updateGroupQuery(id, model.name, model.startYear),
     );
 
@@ -66,6 +58,6 @@ class PostgresGroupRepo extends GroupRepo {
   //===========================================
   @override
   Future<void> delete(int id) async {
-    await _conn.execute(deleteGroupQuery(id));
+    await conn.execute(deleteGroupQuery(id));
   }
 }

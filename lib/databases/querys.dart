@@ -15,10 +15,10 @@ deleteGroupQuery(int id) => "DELETE FROM groups_table WHERE id=$id";
 getAllStudentsQuery() =>
     "SELECT id, first_name, second_name, third_name, student_group, birthday FROM students_table;";
 
-getStudentbyIdQuery(int id) =>
+getStudentByIdQuery(int id) =>
     "SELECT id, first_name, second_name, third_name, student_group, birthday FROM students_table WHERE id=$id;";
 
-getStudentbyGroupIdQuery(int id) =>
+getStudentByGroupIdQuery(int id) =>
     "SELECT students_table.id, first_name, second_name, third_name, student_group, groups_table.group_name, birthday  FROM students_table inner join groups_table on groups_table.id=student_group WHERE groups_table.id=$id;";
 
 createStudentQuery(

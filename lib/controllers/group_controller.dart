@@ -3,29 +3,27 @@ import 'dart:convert';
 import 'package:dart_server_groups/middlewares/error_handler_middleware.dart';
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/group_repo/group_repo.dart';
-import 'package:dart_server_groups/repos/group_repo/postgres_group_repo.dart';
 import 'package:excel/excel.dart';
-import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_multipart/shelf_multipart.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 class GroupController {
   final Router _router = Router();
-  final GroupRepo _groupRepo = GetIt.I<PostgresGroupRepo>();
+  final GroupRepo groupRepo;
+
+  GroupController({required this.groupRepo});
 
   Router get router {
     //---------------------------------------------
     _router.get("/", (Request request) async {
-      final result = (await _groupRepo.getAll())
-          .map((e) => e.toJson())
-          .toList();
+      final result = (await groupRepo.getAll()).map((e) => e.toJson()).toList();
       return Response.ok(json.encode(result));
     });
 
     //---------------------------------------------
     _router.get("/<pk|[0-9]+>/", (Request request, String arg1) async {
-      final result = await _groupRepo.getById(int.parse(arg1));
+      final result = await groupRepo.getById(int.parse(arg1));
 
       if (result == null) {
         throw NotFoundException({"error": "Группа не найдена"});
@@ -47,7 +45,7 @@ class GroupController {
       final String name = requestData["name"];
       final int startYear = requestData["startYear"];
 
-      final result = await _groupRepo.create(
+      final result = await groupRepo.create(
         GroupModel(name: name, startYear: startYear),
       );
 
@@ -67,7 +65,7 @@ class GroupController {
       final String name = requestData["name"];
       final int startYear = requestData["startYear"];
 
-      final result = await _groupRepo.update(
+      final result = await groupRepo.update(
         int.parse(arg1),
         GroupModel(name: name, startYear: startYear),
       );
@@ -81,7 +79,7 @@ class GroupController {
 
     //---------------------------------------------
     _router.delete("/<pk|[0-9]+>/", (Request request, String arg1) async {
-      await _groupRepo.delete(int.parse(arg1));
+      await groupRepo.delete(int.parse(arg1));
       return Response.ok("{}");
     });
 

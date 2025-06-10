@@ -5,28 +5,22 @@ import 'package:dart_server_groups/databases/database.dart';
 import 'package:dart_server_groups/middlewares/error_handler_middleware.dart';
 import 'package:dart_server_groups/middlewares/json_content_type_middleware.dart';
 import 'package:dart_server_groups/repos/group_repo/postgres_group_repo.dart';
-import 'package:get_it/get_it.dart';
+import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-Future<void> setup() async {
-  final Database db = Database();
-
-  final groupRepo = PostgresGroupRepo(db: db);
-  await groupRepo.init();
-
-  GetIt.I.registerSingleton(groupRepo);
-}
-
 void main(List<String> args) async {
   final ip = InternetAddress.anyIPv4;
 
-  await setup();
+  final Connection connection = await Database().conn;
 
   final Router router = Router();
 
-  router.mount("/group/", GroupController().router.call);
+  router.mount(
+    "/group/",
+    GroupController(groupRepo: PostgresGroupRepo(conn: connection)).router.call,
+  );
 
   final handler = Pipeline()
       .addMiddleware(errorHandler())
