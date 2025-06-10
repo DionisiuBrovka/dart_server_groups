@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dart_server_groups/middlewares/error_handler_middleware.dart';
 import 'package:dart_server_groups/models/group_model.dart';
 import 'package:dart_server_groups/repos/group_repo.dart';
 import 'package:excel/excel.dart';
@@ -13,66 +14,65 @@ class GroupController {
   final GroupRepo _groupRepo = GetIt.I<GroupRepo>();
 
   Router get router {
+    //---------------------------------------------
     _router.get("/", (Request request) async {
-      try {
-        final result = (await _groupRepo.getAll())
-            .map((e) => e.toJson())
-            .toList();
-        return Response.ok(json.encode(result));
-      } catch (e) {
-        return Response.internalServerError(body: "{'error':$e}");
-      }
+      final result = (await _groupRepo.getAll())
+          .map((e) => e.toJson())
+          .toList();
+      return Response.ok(json.encode(result));
     });
 
+    //---------------------------------------------
     _router.get("/<pk|[0-9]+>/", (Request request, String arg1) async {
-      try {
-        final result = await _groupRepo.getById(int.parse(arg1));
-        return Response.ok(json.encode(result));
-      } catch (e) {
-        return Response.internalServerError(body: "{'error':$e}");
+      final result = await _groupRepo.getById(int.parse(arg1));
+
+      if (result == null) {
+        throw NotFoundException({"error": "Группа не найдена"});
       }
+
+      return Response.ok(json.encode(result));
     });
 
+    //---------------------------------------------
     _router.post("/", (Request request) async {
-      try {
-        final requestData = json.decode(await request.readAsString());
-        final result = await _groupRepo.create(
-          GroupModelToDB(
-            name: requestData["name"],
-            startYear: requestData["startYear"],
-          ),
-        );
-        return Response.ok(json.encode(result));
-      } catch (e) {
-        return Response.internalServerError(body: "{'error':$e}");
-      }
+      final requestData = json.decode(await request.readAsString());
+
+      final String name = requestData["name"];
+      final int startYear = requestData["startYear"];
+
+      final result = await _groupRepo.create(
+        GroupModelToDB(name: name, startYear: startYear),
+      );
+
+      return Response.ok(json.encode(result));
     });
 
+    //---------------------------------------------
     _router.put("/<pk|[0-9]+>/", (Request request, String arg1) async {
-      try {
-        final requestData = json.decode(await request.readAsString());
-        final result = await _groupRepo.update(
-          int.parse(arg1),
-          GroupModelToDB(
-            name: requestData["name"],
-            startYear: requestData["startYear"],
-          ),
-        );
-        return Response.ok(json.encode(result));
-      } catch (e) {
-        return Response.internalServerError(body: "{'error':$e}");
+      final requestData = json.decode(await request.readAsString());
+
+      final String name = requestData["name"];
+      final int startYear = requestData["startYear"];
+
+      final result = await _groupRepo.update(
+        int.parse(arg1),
+        GroupModelToDB(name: name, startYear: startYear),
+      );
+
+      if (result == null) {
+        throw NotFoundException({"error": "Группа не найдена"});
       }
+
+      return Response.ok(json.encode(result));
     });
 
+    //---------------------------------------------
     _router.delete("/<pk|[0-9]+>/", (Request request, String arg1) async {
-      try {
-        await _groupRepo.delete(int.parse(arg1));
-        return Response.ok("{}");
-      } catch (e) {
-        return Response.internalServerError(body: "{'error':$e}");
-      }
+      await _groupRepo.delete(int.parse(arg1));
+      return Response.ok("{}");
     });
 
+    //---------------------------------------------
     _router.post("/import/", (Request request) async {
       final contentType = request.headers['content-type'];
       if (contentType == null || !contentType.contains('multipart/form-data')) {

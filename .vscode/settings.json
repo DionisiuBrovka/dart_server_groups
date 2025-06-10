@@ -2,5 +2,6 @@
     "cSpell.words": [
         "mgkct"
     ],
-    "dart.sdkPath": "C:\\tools\\dart-sdk"
+    "dart.sdkPath": "C:\\tools\\dart-sdk",
+"editor.fontLigatures": true,
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dart_server_groups/controllers/group_controller.dart';
 import 'package:dart_server_groups/databases/database.dart';
+import 'package:dart_server_groups/middlewares/error_handler_middleware.dart';
 import 'package:dart_server_groups/middlewares/json_content_type_middleware.dart';
 import 'package:dart_server_groups/repos/group_repo.dart';
 import 'package:get_it/get_it.dart';
@@ -28,6 +29,7 @@ void main(List<String> args) async {
   router.mount("/group/", GroupController().router.call);
 
   final handler = Pipeline()
+      .addMiddleware(errorHandler())
       .addMiddleware(logRequests())
       .addMiddleware(jsonContentTypeMiddleware())
       .addHandler(router.call);
